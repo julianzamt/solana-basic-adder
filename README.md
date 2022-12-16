@@ -1,4 +1,6 @@
-# To run this program locally
+A simple Pure Solana Program with two instructions: add, which receives a u32 and adds it to an accumulator, and double, which doubles the accumulator.
+
+### To run this program locally
 * Have a solana-test-validator instance running in a terminal
 * In another terminal:
     - cargo build-bpf
