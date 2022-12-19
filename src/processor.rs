@@ -9,7 +9,7 @@ use solana_program::{
     sysvar::{rent::Rent, Sysvar},
 };
 
-use crate::{instruction::*, state::*};
+use crate::{instruction::*, state::*, stubs::*};
 
 pub struct Processor;
 
@@ -73,7 +73,8 @@ impl Processor {
         msg!("accumulator number: {}", accumulator_data.number);
         msg!("number: {}", number);
 
-        accumulator_data.number += number;
+        add::add(&mut accumulator_data, &number)?;
+        // accumulator_data.number += number;
 
         Adder::pack(accumulator_data, &mut accumulator.try_borrow_mut_data()?)?;
 
