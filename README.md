@@ -1,7 +1,7 @@
 A simple Pure Solana Program with two instructions: add, which receives a u32 and adds it to an accumulator, and double, which doubles the accumulator.
 
 ### To run this program locally
-* Have a solana-test-validator instance running in a terminal
+* In a new terminal: solana-test-validator -r (-r resets the ledger)
 * In another terminal:
     - cargo build-bpf
     - solana program deploy <whatever-your-path>/target/deploy/basic_adder.so --url localhost

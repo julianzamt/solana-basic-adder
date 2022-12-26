@@ -2,4 +2,3 @@
 /Cargo.lock
 /test-ledger
 /cli/node_modules/
-basic-adder.cidl

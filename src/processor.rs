@@ -43,11 +43,11 @@ impl Processor {
     ) -> ProgramResult {
         let account_info_iter = &mut accounts.iter();
 
-        let signer = next_account_info(account_info_iter)?;
-        let accumulator = next_account_info(account_info_iter)?;
+        let signer_account_info = next_account_info(account_info_iter)?;
+        let accumulator_account_info = next_account_info(account_info_iter)?;
 
         // Init if needed
-        if accumulator.lamports() == 0 && *accumulator.owner == solana_program::system_program::id()
+        if accumulator_account_info.lamports() == 0 && *accumulator_account_info.owner == solana_program::system_program::id()
         {
             let rent = &Rent::from_account_info(next_account_info(account_info_iter)?)?;
 
@@ -57,33 +57,26 @@ impl Processor {
 
             invoke_signed(
                 &create_account(
-                    &signer.key,
-                    &accumulator.key,
+                    &signer_account_info.key,
+                    &accumulator_account_info.key,
                     rent_minimum_balance,
                     space as u64,
                     program_id,
                 ),
-                &[signer.clone(), accumulator.clone()],
+                &[signer_account_info.clone(), accumulator_account_info.clone()],
                 &[&[b"accumulator".as_ref(), &[bump]]],
             )?;
         }
 
-        let mut accumulator_data = Adder::unpack_unchecked(&accumulator.try_borrow_data()?)?;
+        let mut accumulator_data = Accumulator::unpack_unchecked(&accumulator_account_info.try_borrow_data()?)?;
 
-        msg!("accumulator number: {}", accumulator_data.number);
-        msg!("number: {}", number);
+        msg!("Accumulator before add: {}", accumulator_data.number);
 
-        add::add(&mut accumulator_data, &number)?;
-        // accumulator_data.number += number;
+        add_stub::ix_logic(&mut accumulator_data, &number)?;
 
-        Adder::pack(accumulator_data, &mut accumulator.try_borrow_mut_data()?)?;
+        Accumulator::pack(accumulator_data.clone(), &mut accumulator_account_info.try_borrow_mut_data()?)?;
 
-        let accumulator_data = Adder::unpack_unchecked(&accumulator.try_borrow_data()?)?;
-
-        msg!(
-            "accumulator number after stored add: {}",
-            accumulator_data.number
-        );
+        msg!("Accumulator after add: {}", accumulator_data.number);
 
         Ok(())
     }
@@ -121,28 +114,21 @@ impl Processor {
             )?;
         }
 
-        let mut accumulator_data = Adder::unpack_unchecked(&accumulator.try_borrow_data()?)?;
+        let mut accumulator_data = Accumulator::unpack_unchecked(&accumulator.try_borrow_data()?)?;
 
         msg!(
-            "accumulator number before double: {}",
+            "Accumulator before double: {}",
             accumulator_data.number
         );
 
-        accumulator_data.number *= 2;
+        double_stub::ix_logic(&mut accumulator_data)?;
 
         msg!(
-            "accumulator number after double: {}",
+            "Accumulator after double: {}",
             accumulator_data.number
         );
 
-        Adder::pack(accumulator_data, &mut accumulator.try_borrow_mut_data()?)?;
-
-        let accumulator_data = Adder::unpack_unchecked(&accumulator.try_borrow_data()?)?;
-
-        msg!(
-            "accumulator number double after storage: {}",
-            accumulator_data.number
-        );
+        Accumulator::pack(accumulator_data, &mut accumulator.try_borrow_mut_data()?)?;
 
         Ok(())
     }

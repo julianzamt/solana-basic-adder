@@ -20,7 +20,7 @@ class Payload {
   bump: number;
   num?: number;
 
-  constructor(_ix: IxVariants, _bump: number,  _num?: number) {
+  constructor(_ix: IxVariants, _bump: number, _num?: number) {
     this.ix = _ix;
     this.bump = _bump;
     this.num = _num;
